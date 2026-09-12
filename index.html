@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>H&amp;M Supplier Qty Indication Portal</title>
+<link rel="stylesheet" href="libs/ag-grid.css" />
+<link rel="stylesheet" href="libs/ag-theme-alpine.css" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ============ LOGIN SCREEN ============ -->
+<section id="login-screen" class="screen">
+  <div class="login-card">
+    <div class="hm-logo"><span>H&amp;M</span></div>
+    <h1>Supplier Qty Indication Portal</h1>
+    <form id="login-form">
+      <label for="login-username">Username</label>
+      <input id="login-username" type="text" autocomplete="username" required />
+
+      <label for="login-password">Password</label>
+      <input id="login-password" type="password" autocomplete="current-password" required />
+
+      <p id="login-error" class="error-text" hidden></p>
+
+      <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+    </form>
+    <p class="login-hint">
+      Demo accounts &mdash; Admin: <code>admin / admin123</code><br />
+      Supplier: <code>supplier1 / supplier123</code>
+    </p>
+  </div>
+</section>
+
+<!-- ============ APP SHELL ============ -->
+<section id="app-screen" class="screen" hidden>
+  <header class="app-header">
+    <div class="hm-logo hm-logo-sm"><span>H&amp;M</span></div>
+    <h2 class="app-title">Supplier Qty Indication Portal</h2>
+    <nav class="app-nav">
+      <button class="nav-btn" data-view="grid">Qty Indication</button>
+      <button class="nav-btn" data-view="dashboard">Dashboard</button>
+      <button class="nav-btn admin-only" data-view="admin" hidden>Admin</button>
+    </nav>
+    <div class="header-user">
+      <span id="current-user-label"></span>
+      <button id="logout-btn" class="btn btn-outline">Log out</button>
+    </div>
+  </header>
+
+  <main class="app-main">
+
+    <!-- Supplier Grid View -->
+    <section id="view-grid" class="view">
+      <div class="view-toolbar">
+        <h3>Deal Quantity Indications</h3>
+        <div class="toolbar-actions">
+          <button id="grid-export-btn" class="btn btn-outline">Export to Excel</button>
+          <button id="grid-submit-btn" class="btn btn-primary">Submit Indications</button>
+        </div>
+      </div>
+      <div id="supplier-grid" class="ag-theme-alpine grid-container"></div>
+    </section>
+
+    <!-- Dashboard View -->
+    <section id="view-dashboard" class="view" hidden>
+      <h3>Allocation Dashboard</h3>
+      <div class="dashboard-cards">
+        <div class="stat-card">
+          <span class="stat-label">Total Deals</span>
+          <span id="stat-total-deals" class="stat-value">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Target Qty</span>
+          <span id="stat-target-qty" class="stat-value">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Indicated Qty</span>
+          <span id="stat-indicated-qty" class="stat-value">0</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Pending Review</span>
+          <span id="stat-pending" class="stat-value">0</span>
+        </div>
+      </div>
+      <div class="dashboard-charts">
+        <div class="chart-box">
+          <h4>Target vs Indicated Qty by Deal</h4>
+          <canvas id="chart-target-vs-indicated"></canvas>
+        </div>
+        <div class="chart-box">
+          <h4>Indication Status Breakdown</h4>
+          <canvas id="chart-status-breakdown"></canvas>
+        </div>
+        <div class="chart-box chart-box-wide">
+          <h4>Top Suppliers by Indicated Qty</h4>
+          <canvas id="chart-top-suppliers"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Admin View -->
+    <section id="view-admin" class="view" hidden>
+      <div class="admin-tabs">
+        <button class="admin-tab-btn active" data-admin-tab="deals">Deals</button>
+        <button class="admin-tab-btn" data-admin-tab="indications">Indications</button>
+        <button class="admin-tab-btn" data-admin-tab="suppliers">Suppliers</button>
+      </div>
+
+      <!-- Deals management -->
+      <section id="admin-tab-deals" class="admin-tab-panel">
+        <div class="view-toolbar">
+          <h3>Manage Deals</h3>
+          <div class="toolbar-actions">
+            <button id="deal-add-btn" class="btn btn-outline">Add Deal</button>
+            <input type="file" id="deal-import-input" accept=".xlsx,.xls,.csv" hidden />
+            <button id="deal-import-btn" class="btn btn-outline">Import Excel</button>
+            <button id="deal-export-btn" class="btn btn-primary">Export Excel</button>
+          </div>
+        </div>
+        <div id="admin-deals-grid" class="ag-theme-alpine grid-container"></div>
+      </section>
+
+      <!-- Indications review -->
+      <section id="admin-tab-indications" class="admin-tab-panel" hidden>
+        <div class="view-toolbar">
+          <h3>Review Supplier Indications</h3>
+          <div class="toolbar-actions">
+            <button id="indication-approve-btn" class="btn btn-outline">Approve Selected</button>
+            <button id="indication-reject-btn" class="btn btn-outline">Reject Selected</button>
+            <button id="indication-export-btn" class="btn btn-primary">Export Excel</button>
+          </div>
+        </div>
+        <div id="admin-indications-grid" class="ag-theme-alpine grid-container"></div>
+      </section>
+
+      <!-- Suppliers management -->
+      <section id="admin-tab-suppliers" class="admin-tab-panel" hidden>
+        <div class="view-toolbar">
+          <h3>Manage Suppliers</h3>
+          <div class="toolbar-actions">
+            <button id="supplier-add-btn" class="btn btn-primary">Add Supplier</button>
+          </div>
+        </div>
+        <div id="admin-suppliers-grid" class="ag-theme-alpine grid-container"></div>
+      </section>
+    </section>
+
+  </main>
+</section>
+
+<script src="libs/ag-grid-community.min.js"></script>
+<script src="libs/chart.umd.js"></script>
+<script src="libs/xlsx.full.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
